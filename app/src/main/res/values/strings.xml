@@ -14,4 +14,5 @@
     <string name="decrement_text">-</string>
     <string name="increment_text">+</string>
     <string name="to_details">to details</string>
+    <string name="searchbutton">SearchButton</string>
 </resources>

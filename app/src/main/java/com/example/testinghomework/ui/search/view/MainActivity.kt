@@ -39,12 +39,20 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         binding.toDetailsActivityButton.setOnClickListener {
             startActivity(DetailsActivity.getIntent(this, totalCount))
         }
+        setSearchListener()
         setQueryListener()
         setRecyclerListener()
     }
 
+    private fun setSearchListener() {
+        binding.fabSearchButton.setOnClickListener {
+            val searchQuery = binding.searchEditText.text.toString()
+            if (searchQuery.isNotEmpty()) presenter.searchGithub(searchQuery)
+        }
+    }
+
     private fun setQueryListener() {
-        binding.searchEditText.setOnEditorActionListener { v, actionId, event ->
+        binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val query = binding.searchEditText.text.toString()
                 if (query.isNotBlank()) {
