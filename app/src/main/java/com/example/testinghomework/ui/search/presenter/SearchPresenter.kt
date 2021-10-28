@@ -2,25 +2,17 @@ package com.example.testinghomework.ui.search.presenter
 
 import com.example.testinghomework.model.SearchResponse
 import com.example.testinghomework.repository.GitHubRepository
-import com.example.testinghomework.repository.GitHubRepository.*
+import com.example.testinghomework.repository.RepositoryCallback
 import com.example.testinghomework.ui.search.view.ViewSearchContract
 import retrofit2.Response
 
 class SearchPresenter internal constructor(
     private val viewContract: ViewSearchContract,
     private val repository: GitHubRepository
-): PresenterSearchContract, GitHubRepositoryCallback {
+): PresenterSearchContract, RepositoryCallback {
 
     override fun searchGithub(searchQuery: String) {
         repository.searchGithub(searchQuery, this)
-    }
-
-    override fun attach() {
-
-    }
-
-    override fun detach() {
-
     }
 
     override fun handleGitHubResponse(response: Response<SearchResponse?>?) {
