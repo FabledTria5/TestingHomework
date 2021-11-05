@@ -1,15 +1,18 @@
 package com.example.testinghomework.ui.search.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import com.example.testinghomework.BuildConfig
 import com.example.testinghomework.R
 import com.example.testinghomework.databinding.ActivityMainBinding
 import com.example.testinghomework.model.SearchResult
+import com.example.testinghomework.repository.FakeGitHubRepository
 import com.example.testinghomework.repository.GitHubApi
 import com.example.testinghomework.repository.GitHubRepository
+import com.example.testinghomework.repository.RepositoryContract
 import com.example.testinghomework.ui.details.view.DetailsActivity
 import com.example.testinghomework.ui.search.presenter.PresenterSearchContract
 import com.example.testinghomework.ui.search.presenter.SearchPresenter
@@ -20,6 +23,8 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
 
     companion object {
         const val BASE_URL = "https://api.github.com"
+
+        const val FAKE = "FAKE"
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -77,9 +82,10 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         }
     }
 
-    private fun createRepository(): GitHubRepository {
-        return GitHubRepository(createRetrofit().create(GitHubApi::class.java))
-    }
+    private fun createRepository() = if (BuildConfig.TYPE == FAKE)
+        FakeGitHubRepository()
+    else
+        GitHubRepository(createRetrofit().create(GitHubApi::class.java))
 
     private fun createRetrofit(): Retrofit {
         return Retrofit.Builder()
