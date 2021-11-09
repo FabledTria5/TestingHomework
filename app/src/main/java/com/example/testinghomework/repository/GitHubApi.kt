@@ -11,4 +11,8 @@ interface GitHubApi {
     @GET("search/repositories")
     fun searchGithub(@Query("q") term: String?): Call<SearchResponse?>?
 
+    @Headers("Accept: application/vnd.github.mercy-preview+json")
+    @GET("search/repositories")
+    suspend fun searchGithubAsync(@Query("q") term: String?): SearchResponse
+
 }
