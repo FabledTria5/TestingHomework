@@ -14,6 +14,10 @@ internal class FakeGitHubRepository : RepositoryContract {
         callback.handleGitHubResponse(Response.success(getFakeResponse()))
     }
 
+    override suspend fun searchGithubAsync(query: String): SearchResponse {
+        return SearchResponse(0, listOf())
+    }
+
     private fun getFakeResponse(): SearchResponse {
         val list = mutableListOf<SearchResult>()
         (1..100).forEachIndexed { index, _ ->

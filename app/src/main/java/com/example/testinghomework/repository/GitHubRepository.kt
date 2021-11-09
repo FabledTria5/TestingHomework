@@ -1,6 +1,5 @@
 package com.example.testinghomework.repository
 
-import android.util.Log
 import com.example.testinghomework.model.SearchResponse
 import retrofit2.Call
 import retrofit2.Callback
@@ -30,4 +29,6 @@ internal class GitHubRepository(private val gitHubApi: GitHubApi) : RepositoryCo
             }
         })
     }
+
+    override suspend fun searchGithubAsync(query: String) = gitHubApi.searchGithubAsync(query)
 }

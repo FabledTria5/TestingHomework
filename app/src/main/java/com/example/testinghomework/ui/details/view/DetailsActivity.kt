@@ -3,14 +3,14 @@ package com.example.testinghomework.ui.details.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.testinghomework.R
 import com.example.testinghomework.databinding.ActivityDetailsBinding
-import com.example.testinghomework.ui.details.presenter.DetailsPresenter
-import com.example.testinghomework.ui.details.presenter.PresenterDetailsContract
+import com.example.testinghomework.ui.details.viewmodel.DetailsViewModel
 import java.util.*
 
-class DetailsActivity : AppCompatActivity(), ViewDetailsContract {
+class DetailsActivity : AppCompatActivity() {
 
     companion object {
         const val TOTAL_COUNT_EXTRA = "TOTAL_COUNT_EXTRA"
@@ -23,7 +23,9 @@ class DetailsActivity : AppCompatActivity(), ViewDetailsContract {
 
     private lateinit var binding: ActivityDetailsBinding
 
-    private val presenter: PresenterDetailsContract = DetailsPresenter(viewContract = this)
+    private val count: Int by lazy { intent.getIntExtra(TOTAL_COUNT_EXTRA, 0) }
+    private val viewModelFactory by lazy { DetailsViewModel.DetailsViewModelFactory(count) }
+    private val detailsViewModel: DetailsViewModel by viewModels(factoryProducer = { viewModelFactory })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,17 +34,13 @@ class DetailsActivity : AppCompatActivity(), ViewDetailsContract {
     }
 
     private fun setUi() {
-        val count = intent.getIntExtra(TOTAL_COUNT_EXTRA, 0)
-        presenter.setCounter(count)
-        setCountText(count = count)
-        with(binding) {
-            decrementButton.setOnClickListener { presenter.onDecrement() }
-            incrementButton.setOnClickListener { presenter.onIncrement() }
+        detailsViewModel.counter.observe(this) {
+            setCountText(it)
         }
-    }
-
-    override fun setCount(count: Int) {
-        setCountText(count = count)
+        with(binding) {
+            decrementButton.setOnClickListener { detailsViewModel.decrementCounter() }
+            incrementButton.setOnClickListener { detailsViewModel.incrementCounter() }
+        }
     }
 
     private fun setCountText(count: Int) {
