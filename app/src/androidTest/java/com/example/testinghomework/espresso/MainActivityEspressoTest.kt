@@ -7,11 +7,13 @@ import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.testinghomework.BuildConfig
 import com.example.testinghomework.R
 import com.example.testinghomework.ui.search.view.MainActivity
-import org.hamcrest.Matcher
+import com.example.testinghomework.ui.search.view.SearchResultAdapter
 import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Before
@@ -20,6 +22,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityEspressoTest {
+
     private lateinit var scenario: ActivityScenario<MainActivity>
 
     @Before
@@ -29,27 +32,94 @@ class MainActivityEspressoTest {
 
     @Test
     fun activitySearch_IsWorking() {
-        onView(withId(R.id.searchEditText)).perform(click())
-        onView(withId(R.id.searchEditText)).perform(
-            replaceText("logger"),
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.searchEditText)).perform(pressImeActionButton())
-
-        onView(isRoot()).perform(delay())
+        loadList()
 
         onView(withId(R.id.toDetailsActivityButton)).perform(click())
-        onView(withId(R.id.totalCountTextView))
+        onView(withId(R.id.numberOfResults))
             .check(matches(not(withText("Number of results: 0"))))
     }
 
-    private fun delay(): ViewAction {
-        return object : ViewAction {
-            override fun getConstraints(): Matcher<View> = isRoot()
-            override fun getDescription(): String = "wait for $2 seconds"
-            override fun perform(uiController: UiController, v: View?) {
-                uiController.loopMainThreadForAtLeast(2000)
-            }
+    @Test
+    fun activitySearch_ScrollTo() {
+        if (BuildConfig.TYPE == MainActivity.FAKE) {
+            loadList()
+
+            onView(withId(R.id.recyclerView))
+                .perform(
+                    RecyclerViewActions.scrollTo<SearchResultAdapter.SearchResultViewHolder>(
+                        hasDescendant(withText("Full Name: 15"))
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun activitySearch_PerformClickAtPosition() {
+        if (BuildConfig.TYPE == MainActivity.FAKE) {
+            loadList()
+
+            onView(withId(R.id.recyclerView))
+                .perform(
+                    RecyclerViewActions.actionOnItemAtPosition<SearchResultAdapter.SearchResultViewHolder>(
+                        0,
+                        click()
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun activitySearch_PerformClickOnItem() {
+        if (BuildConfig.TYPE == MainActivity.FAKE) {
+            loadList()
+
+            onView(withId(R.id.recyclerView))
+                .perform(
+                    RecyclerViewActions.scrollTo<SearchResultAdapter.SearchResultViewHolder>(
+                        hasDescendant(withText("Full Name: 45"))
+                    )
+                )
+
+            onView(withId(R.id.recyclerView))
+                .perform(
+                    RecyclerViewActions.actionOnItem<SearchResultAdapter.SearchResultViewHolder>(
+                        hasDescendant(withText("Full Name: 42")),
+                        click()
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun activitySearch_PerformCustomClick() {
+        if (BuildConfig.TYPE == MainActivity.FAKE) {
+            loadList()
+
+            onView(withId(R.id.recyclerView))
+                .perform(
+                    RecyclerViewActions
+                        .actionOnItemAtPosition<SearchResultAdapter.SearchResultViewHolder>(
+                            0,
+                            tapOnItemWithId(R.id.checkbox)
+                        )
+                )
+        }
+    }
+
+    private fun loadList() {
+        onView(withId(R.id.searchEditText)).perform(click())
+        onView(withId(R.id.searchEditText)).perform(replaceText("algol"), closeSoftKeyboard())
+        onView(withId(R.id.fabSearchButton)).perform(click())
+    }
+
+    private fun tapOnItemWithId(id: Int) = object : ViewAction {
+        override fun getConstraints() = null
+
+        override fun getDescription() = "Нажимаем на view с указанным id"
+
+        override fun perform(uiController: UiController?, view: View?) {
+            val v = view?.findViewById(id) as View
+            v.performClick()
         }
     }
 
