@@ -1,5 +1,6 @@
 package com.example.testinghomework.ui.search.view
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,7 @@ import com.example.testinghomework.model.SearchResult
 
 internal class SearchResultAdapter : RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder>() {
 
-    private var results: List<SearchResult> = listOf()
+    private var results: ArrayList<SearchResult> = arrayListOf()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -32,9 +33,11 @@ internal class SearchResultAdapter : RecyclerView.Adapter<SearchResultAdapter.Se
         return results.size
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateResults(results: List<SearchResult>) {
-        this.results = results
-        notifyItemRangeInserted(0, results.size)
+        this.results.clear()
+        this.results.addAll(results)
+        notifyDataSetChanged()
     }
 
     internal class SearchResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

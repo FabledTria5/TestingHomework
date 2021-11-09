@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.core.view.isVisible
 import com.example.testinghomework.R
 import com.example.testinghomework.databinding.ActivityMainBinding
 import com.example.testinghomework.model.SearchResult
@@ -31,7 +32,6 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
-
         setUi()
     }
 
@@ -39,12 +39,20 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         binding.toDetailsActivityButton.setOnClickListener {
             startActivity(DetailsActivity.getIntent(this, totalCount))
         }
+        setSearchListener()
         setQueryListener()
         setRecyclerListener()
     }
 
+    private fun setSearchListener() {
+        binding.fabSearchButton.setOnClickListener {
+            val searchQuery = binding.searchEditText.text.toString()
+            if (searchQuery.isNotEmpty()) presenter.searchGithub(searchQuery)
+        }
+    }
+
     private fun setQueryListener() {
-        binding.searchEditText.setOnEditorActionListener { v, actionId, event ->
+        binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val query = binding.searchEditText.text.toString()
                 if (query.isNotBlank()) {
@@ -65,7 +73,6 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
 
     private fun setRecyclerListener() {
         with(binding) {
-            recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter
         }
     }
@@ -83,6 +90,8 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
 
     override fun displaySearchResults(searchResults: List<SearchResult>, totalCount: Int) {
         this.totalCount = totalCount
+        binding.totalCountTextView.isVisible = true
+        binding.totalCountTextView.text = getString(R.string.results_count, this.totalCount)
         adapter.updateResults(searchResults)
     }
 

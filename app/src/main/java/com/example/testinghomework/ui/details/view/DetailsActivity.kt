@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.testinghomework.R
 import com.example.testinghomework.databinding.ActivityDetailsBinding
-import com.example.testinghomework.ui.base.PresenterContract
 import com.example.testinghomework.ui.details.presenter.DetailsPresenter
 import com.example.testinghomework.ui.details.presenter.PresenterDetailsContract
 import java.util.*
@@ -29,13 +28,7 @@ class DetailsActivity : AppCompatActivity(), ViewDetailsContract {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailsBinding.inflate(layoutInflater).also { setContentView(it.root) }
-        (presenter as PresenterContract).attach()
         setUi()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        (presenter as PresenterContract).detach()
     }
 
     private fun setUi() {
@@ -53,7 +46,7 @@ class DetailsActivity : AppCompatActivity(), ViewDetailsContract {
     }
 
     private fun setCountText(count: Int) {
-        binding.totalCountTextView.text =
+        binding.numberOfResults.text =
             String.format(Locale.getDefault(), getString(R.string.results_count), count)
     }
 
